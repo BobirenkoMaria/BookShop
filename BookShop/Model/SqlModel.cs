@@ -96,7 +96,7 @@ namespace BookShop.Model
         {
             var groups = new List<Sales>();
             var mySqlDB = MySqlDB.GetDB();
-            string query = $"SELECT * FROM ``booksdeliveries`";
+            string query = $"SELECT * FROM `booksdeliveries`";
 
             if (mySqlDB.OpenConnection())
             {

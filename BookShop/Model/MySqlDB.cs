@@ -100,8 +100,8 @@ namespace BookShop.Model
                 using (MySqlCommand mc = new MySqlCommand($"SHOW TABLE STATUS WHERE `Name` = '{table}'", sqlConnection))
                 using (MySqlDataReader dr = mc.ExecuteReader())
                 {
-                    dr.Read();
-                    result = dr.GetInt32(column);
+                    if (dr.Read())
+                        result = dr.GetInt32(column);
                 }
                 CloseConnection();
             }

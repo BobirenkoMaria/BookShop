@@ -144,9 +144,9 @@
 
         <Grid x:Name="StatWin"
               Grid.Row="1" Grid.Column="1"
-              Visibility="Hidden">
+              Visibility="Visible">
             <Border Background="#FF222030">
-
+                
             </Border>
         </Grid>
 
