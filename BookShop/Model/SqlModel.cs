@@ -96,7 +96,7 @@ namespace BookShop.Model
         {
             var groups = new List<Sales>();
             var mySqlDB = MySqlDB.GetDB();
-            string query = $"SELECT * FROM `booksdeliveries`";
+            string query = $"SELECT * FROM `sales`";
 
             if (mySqlDB.OpenConnection())
             {
@@ -118,6 +118,50 @@ namespace BookShop.Model
                 mySqlDB.CloseConnection();
             }
             return groups;
+        }
+
+        public List<int> SelectRowToList_int(string RowTitle)
+        {
+            List<int> StrInRow = new List<int>();
+            var mySqlDB = MySqlDB.GetDB();
+            string query = $"SELECT {RowTitle} FROM `datebysale`";
+
+            if (mySqlDB.OpenConnection())
+            {
+                using (MySqlCommand mc = new MySqlCommand(query, mySqlDB.sqlConnection))
+                using (MySqlDataReader dr = mc.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        int Value;
+                        StrInRow.Add(dr.GetInt32(RowTitle));
+                    }
+                }
+                mySqlDB.CloseConnection();
+            }
+            return StrInRow;
+        }
+
+        public List<DateTime> SelectRowToList_DateTime(string RowTitle)
+        {
+            List<DateTime> StrInRow = new List<DateTime>();
+            var mySqlDB = MySqlDB.GetDB();
+            string query = $"SELECT {RowTitle} FROM `datebysale`";
+
+            if (mySqlDB.OpenConnection())
+            {
+                using (MySqlCommand mc = new MySqlCommand(query, mySqlDB.sqlConnection))
+                using (MySqlDataReader dr = mc.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        int Value;
+                        StrInRow.Add(dr.GetDateTime(RowTitle));
+                    }
+                }
+                mySqlDB.CloseConnection();
+            }
+            return StrInRow;
         }
 
         private static (string, MySqlParameter[]) CreateInsertQuery(string table, List<(string, object)> values)

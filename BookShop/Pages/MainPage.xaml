@@ -3,6 +3,7 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
       xmlns:local="clr-namespace:BookShop"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
@@ -11,7 +12,8 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
-            <RowDefinition Height="69*"/>
+            <RowDefinition Height="309*"/>
+            <RowDefinition Height="91*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="9*" />
@@ -43,7 +45,7 @@
 
         <!--Buttons Panel-->
 
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="1" Grid.RowSpan="2">
             <Grid.RowDefinitions>
                 <RowDefinition/>
                 <RowDefinition/>
@@ -76,17 +78,26 @@
 
         <!--Top Panel-->
 
-        <Button Click="AddNewBook" HorizontalAlignment="Left"
-                Grid.Column="1" Margin="20 0"
-                    MinWidth="50" MaxWidth="100" Height="50" 
-                    FontSize="14" FontWeight="Bold"
-                    Foreground="White" BorderThickness="0" BorderBrush="White" Background="#FFE05B4A">
-            <TextBlock TextAlignment="Center" Margin="5"> Добавить <LineBreak/> книгу</TextBlock>
-        </Button>
+        <StackPanel Grid.Column="1" Margin="10,0,10,0" Orientation="Horizontal">
+            <Button Click="AddNewBook" HorizontalAlignment="Left"
+                Margin="10 0"
+                MinWidth="50" MaxWidth="100" Height="50" 
+                FontSize="14" FontWeight="Bold"
+                Foreground="White" BorderThickness="0" BorderBrush="White" Background="#FFE05B4A">
+                <TextBlock TextAlignment="Center" Margin="5"> Добавить <LineBreak/> книгу</TextBlock>
+            </Button>
 
+            <Button Click="AddNewOperation" HorizontalAlignment="Left"
+                    Margin="10 0"
+                MinWidth="50" MaxWidth="100" Height="50"
+                FontSize="14" FontWeight="Bold"
+                Foreground="White" BorderThickness="0" BorderBrush="White" Background="#FFE05B4A">
+                <TextBlock TextAlignment="Center" Margin="5"> Добавить <LineBreak/> операцию</TextBlock>
+            </Button>
+        </StackPanel>
         <TextBox x:Name="nameFilter"
-                 Grid.Column="1" HorizontalAlignment="Right"
-                  Width="250" Margin="20 0"
+                 Grid.Column="1" HorizontalAlignment="Left"
+                  Width="250" Margin="458,0,0,0"
                  VerticalAlignment="Center"
                  TextWrapping="Wrap" Text=""/>
 
@@ -96,7 +107,7 @@
 
         <!--Data Base data-->
 
-        <TabControl Grid.Column="1" Grid.Row="1" Background="Transparent">
+        <TabControl Grid.Column="1" Grid.Row="1" Background="Transparent" Grid.RowSpan="2">
             <TabItem>
                 <TabItem.Header>
                     <TextBlock Text="Общее"/>
@@ -136,6 +147,25 @@
                     </ListView>
                 </TabItem.Content>
             </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <TextBlock Text="Операции"/>
+                </TabItem.Header>
+                <TabItem.Content>
+                    <ListView
+                        Background="Transparent" BorderBrush="Transparent" Foreground="White"
+                        ItemsSource="{Binding ListViewStats.Statist}">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="Название книги" DisplayMemberBinding="{Binding BookTitle}"/>
+                                <GridViewColumn Header="Доставлено книг" DisplayMemberBinding="{Binding ImportBooks}"/>
+                                <GridViewColumn Header="Продано книг" DisplayMemberBinding="{Binding BooksSold}"/>
+                                <GridViewColumn Header="Время операции" DisplayMemberBinding="{Binding OperationDate, StringFormat=dd.MM.yyyy}"/>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </TabItem.Content>
+            </TabItem>
         </TabControl>
 
         <!--/Data Base data-->
@@ -144,9 +174,22 @@
 
         <Grid x:Name="StatWin"
               Grid.Row="1" Grid.Column="1"
-              Visibility="Visible">
+              Visibility="Hidden" Grid.RowSpan="2">
             <Border Background="#FF222030">
-                
+                <TabControl Background="Transparent">
+                    <TabItem>
+                        <TabItem.Header>
+                            <TextBlock Text="Tab1"/>
+                        </TabItem.Header>
+                        <TabItem.Content>
+                            <lvc:CartesianChart x:Name="SalesByDate" Series="{Binding Series}">
+                                <lvc:CartesianChart.AxisX>
+                                    <lvc:Axis LabelFormatter="{Binding Formatter}"/>
+                                </lvc:CartesianChart.AxisX>
+                            </lvc:CartesianChart>
+                        </TabItem.Content>
+                    </TabItem>
+                </TabControl>
             </Border>
         </Grid>
 
@@ -196,7 +239,7 @@
         <!--Add New Book-->
 
         <Grid x:Name="AddBookWin"
-            Grid.ColumnSpan="2" Grid.RowSpan="2"
+            Grid.ColumnSpan="2" Grid.RowSpan="3"
               Visibility="Hidden">
 
             <Grid.ColumnDefinitions>
@@ -206,7 +249,7 @@
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition/>
-                <RowDefinition Height="375"/>
+                <RowDefinition Height="350"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
 
@@ -245,6 +288,53 @@
         </Grid>
 
         <!--/Add New Book-->
+
+        <!--Add New Operation-->
+
+        <Grid x:Name="AddOperationWin"
+            Grid.ColumnSpan="2" Grid.RowSpan="3"
+              Visibility="Hidden">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="444.444"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition Height="220"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <Border CornerRadius="25"
+                Grid.Column="1" Grid.Row="1"
+                Background="#FF16151D">
+
+                <StackPanel Margin="20"
+                            DataContext="{Binding AddNewOperation}">
+                    <TextBox
+                        Margin="0 10"
+                        Text="{Binding EditOperations.Title}"/>
+                    <TextBox
+                        Margin="0 10"
+                        Text="{Binding EditOperations.ImportBooks}"/>
+                    <TextBox
+                        Margin="0 10"
+                        Text="{Binding EditOperations.BooksSold}"/>
+                    <DatePicker
+                        Margin="0 10"
+                        Text="{Binding EditOperations.OperationDate}"/>
+
+                    <Button Content="Сохранить"
+                            HorizontalAlignment="Right"
+                            Command="{Binding SaveBook}"
+                            Click="AddBook"/>
+                </StackPanel>
+
+            </Border>
+        </Grid>
+
+        <!--/Add New Operation-->
 
         <!--<Grid Grid.Row="1" Grid.Column="1"
               HorizontalAlignment="Center" Margin="0,5,0,0" Width="640" >

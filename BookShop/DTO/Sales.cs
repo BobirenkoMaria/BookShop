@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BookShop.DTO
 {
-    [Table("`booksdeliveries")]
+    [Table("`sales")]
     public class Sales : BaseDTO
     {
         [Column("ImportBooks")]

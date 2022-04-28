@@ -14,6 +14,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using LiveCharts;
+using LiveCharts.Wpf;
 
 namespace BookShop
 {
@@ -25,7 +27,9 @@ namespace BookShop
         CurrentPageControl currentPageControl;
 
         bool OpenedWin;
+
         bool OpenedAddBookWin;
+        bool OpenedAddOperationWin;
 
         public MainPage(CurrentPageControl currentPageControl)
         {
@@ -43,6 +47,9 @@ namespace BookShop
 
             OpenedAddBookWin = false;
             AddBookWin.Visibility = Visibility.Hidden;
+
+            OpenedAddOperationWin = false;
+            AddOperationWin.Visibility = Visibility.Hidden;
         }
 
         private void ConnectDataBase(object sender, RoutedEventArgs e)
@@ -61,12 +68,13 @@ namespace BookShop
 
         private void AddNewBook(object sender, RoutedEventArgs e)
         {
-            //NavigationService.Navigate(new AddBook());
             if (!OpenedAddBookWin)
             {
                 AddBookWin.Visibility = Visibility.Visible;
                 DataBaseBorder.Visibility = Visibility.Hidden;
+                AddOperationWin.Visibility = Visibility.Hidden;
 
+                OpenedAddOperationWin = false;
                 OpenedAddBookWin = true;
             }
             else
@@ -90,6 +98,24 @@ namespace BookShop
         {
             AddBookWin.Visibility = Visibility.Hidden;
             NavigationService.Navigate(new MainPage(currentPageControl));
+        }
+
+        private void AddNewOperation(object sender, RoutedEventArgs e)
+        {
+            if (!OpenedAddOperationWin)
+            {
+                AddOperationWin.Visibility = Visibility.Visible;
+                DataBaseBorder.Visibility = Visibility.Hidden;
+                AddBookWin.Visibility = Visibility.Hidden;
+
+                OpenedAddBookWin = false;
+                OpenedAddOperationWin = true;
+            }
+            else
+            {
+                AddOperationWin.Visibility = Visibility.Hidden;
+                OpenedAddOperationWin = false;
+            }
         }
     }
 }
