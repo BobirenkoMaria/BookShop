@@ -13,7 +13,6 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
             <RowDefinition Height="309*"/>
-            <RowDefinition Height="91*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="9*" />
@@ -45,7 +44,7 @@
 
         <!--Buttons Panel-->
 
-        <Grid Grid.Row="1" Grid.RowSpan="2">
+        <Grid Grid.Row="1">
             <Grid.RowDefinitions>
                 <RowDefinition/>
                 <RowDefinition/>
@@ -138,10 +137,10 @@
                         ItemsSource="{Binding ListViewSales.SalesList}">
                         <ListView.View>
                             <GridView>
-                                <GridViewColumn Header="Доставлено книг" DisplayMemberBinding="{Binding ImportBooks}"/>
-                                <GridViewColumn Header="Затраты на одну книгу" DisplayMemberBinding="{Binding Expenses}"/>
+                                <GridViewColumn Header="На складе" DisplayMemberBinding="{Binding ImportBooks}"/>
+                                <GridViewColumn Header="Себестроимость" DisplayMemberBinding="{Binding Expenses}"/>
                                 <GridViewColumn Header="Продано книг" DisplayMemberBinding="{Binding BooksSold}"/>
-                                <GridViewColumn Header="Цена на одну книгу" DisplayMemberBinding="{Binding Price}"/>
+                                <GridViewColumn Header="Цена" DisplayMemberBinding="{Binding Price}"/>
                             </GridView>
                         </ListView.View>
                     </ListView>
@@ -154,12 +153,14 @@
                 <TabItem.Content>
                     <ListView
                         Background="Transparent" BorderBrush="Transparent" Foreground="White"
-                        ItemsSource="{Binding ListViewStats.Statist}">
+                        ItemsSource="{Binding AddNewOperation.OperationsList}">
                         <ListView.View>
                             <GridView>
-                                <GridViewColumn Header="Название книги" DisplayMemberBinding="{Binding BookTitle}"/>
+                                <GridViewColumn Header="Название книги" DisplayMemberBinding="{Binding Book_id}"/>
                                 <GridViewColumn Header="Доставлено книг" DisplayMemberBinding="{Binding ImportBooks}"/>
+                                <GridViewColumn Header="Себестоимость" DisplayMemberBinding="{Binding Expenses}"/>
                                 <GridViewColumn Header="Продано книг" DisplayMemberBinding="{Binding BooksSold}"/>
+                                <GridViewColumn Header="Цена" DisplayMemberBinding="{Binding Price}"/>
                                 <GridViewColumn Header="Время операции" DisplayMemberBinding="{Binding OperationDate, StringFormat=dd.MM.yyyy}"/>
                             </GridView>
                         </ListView.View>
@@ -174,7 +175,7 @@
 
         <Grid x:Name="StatWin"
               Grid.Row="1" Grid.Column="1"
-              Visibility="Hidden" Grid.RowSpan="2">
+              Visibility="Visible" Grid.RowSpan="2">
             <Border Background="#FF222030">
                 <TabControl Background="Transparent">
                     <TabItem>
@@ -182,7 +183,7 @@
                             <TextBlock Text="Tab1"/>
                         </TabItem.Header>
                         <TabItem.Content>
-                            <lvc:CartesianChart x:Name="SalesByDate" Series="{Binding Series}">
+                            <lvc:CartesianChart x:Name="SalesByDate" DataContext="{Binding Statistic}" Series="{Binding Series}" LegendLocation="Right" Foreground="White">
                                 <lvc:CartesianChart.AxisX>
                                     <lvc:Axis LabelFormatter="{Binding Formatter}"/>
                                 </lvc:CartesianChart.AxisX>
@@ -302,7 +303,7 @@
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition/>
-                <RowDefinition Height="220"/>
+                <RowDefinition Height="180"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
 
@@ -311,24 +312,21 @@
                 Background="#FF16151D">
 
                 <StackPanel Margin="20"
-                            DataContext="{Binding AddNewOperation}">
+                            DataContext="{Binding AddNewOperations}">
+                    <ComboBox 
+                        Margin="0 10"
+                        ItemsSource="{Binding Books}" DisplayMemberPath="Title"/>
                     <TextBox
                         Margin="0 10"
-                        Text="{Binding EditOperations.Title}"/>
+                        Text="{Binding ImportBooks}"/>
                     <TextBox
                         Margin="0 10"
-                        Text="{Binding EditOperations.ImportBooks}"/>
-                    <TextBox
-                        Margin="0 10"
-                        Text="{Binding EditOperations.BooksSold}"/>
-                    <DatePicker
-                        Margin="0 10"
-                        Text="{Binding EditOperations.OperationDate}"/>
+                        Text="{Binding BooksSold}"/>
 
                     <Button Content="Сохранить"
                             HorizontalAlignment="Right"
-                            Command="{Binding SaveBook}"
-                            Click="AddBook"/>
+                            Command="{Binding SaveOperation}"
+                            Click="AddOperation"/>
                 </StackPanel>
 
             </Border>

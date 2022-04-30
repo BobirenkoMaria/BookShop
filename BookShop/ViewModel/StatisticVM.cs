@@ -6,86 +6,109 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LiveCharts;
+using LiveCharts.Wpf;
+using LiveCharts.Defaults;
+using System.Windows.Media;
+using LiveCharts.Configurations;
 
 namespace BookShop.ViewModel
 {
-    class StatisticVM : BaseVM
+    class StatisticVM 
     {
+        var dayConfig = Mappers.Xy<DateModel>()
+                .X(dayModel => (double)dayModel.Date.Ticks / TimeSpan.FromHours(1).Ticks)
+                .Y(dayModel => dayModel.Value);
 
 
-        private List<int> pageIndexes;
-        private int selectedIndex;
-        private int viewRows;
+        public SeriesCollection Series { get; set; }
+        public string[] Labels { get; set; }
+        public Func<double, string> Formatter { get; set; }
 
-        private List<DateTime> statisticDate;
-        public List<DateTime> StatisticDate
+        private void Points()
         {
-            get => statisticDate;
-            set
+            Series = new SeriesCollection(dayConfig)
             {
-                statisticDate = value;
-                Signal();
-            }
-        }
+                new LineSeries
+                {
+                    Values = new ChartValues<DateModel>
+                    {
+                        new DateModel
+                        {
+                            Date = System.DateTime.Now,
+                            Value = 5
+                        },
+                        new DateModel
+                        {
+                            Date = System.DateTime.Now.AddHours(2),
+                            Value = 9
+                        }
+                    },
+                    Title = "На складе",
+                    Fill = Brushes.Transparent
+                },
+                new LineSeries
+                {
+                    Values = new ChartValues<DateModel>
+                    {
+                        new DateModel
+                        {
+                            Date = System.DateTime.Now,
+                            Value = 5
+                        },
+                        new DateModel
+                        {
+                            Date = System.DateTime.Now.AddHours(2),
+                            Value = 9
+                        },
+                    },
+                    Title = "Себестоимость",
+                    Fill = Brushes.Transparent
+                },
+                new LineSeries
+                {
+                    Values = new ChartValues<DateModel>
+                    {
+                        new DateModel
+                        {
+                            Date = System.DateTime.Now,
+                            Value = 5
+                        },
+                        new DateModel
+                        {
+                            Date = System.DateTime.Now.AddHours(2),
+                            Value = 9
+                        },
+                    },
+                    Title = "Продано",
+                    Fill = Brushes.Transparent
+                },
+                new LineSeries
+                {
+                    Values = new ChartValues<DateModel>
+                    {
+                        new DateModel
+                        {
+                            Date = System.DateTime.Now,
+                            Value = 5
+                        },
+                        new DateModel
+                        {
+                            Date = System.DateTime.Now.AddHours(2),
+                            Value = 9
+                        },
+                    },
+                    Title = "Цена",
+                    Fill = Brushes.Transparent
+                }
+            };
 
-        public CommandVM ViewBack { get; set; }
-        public CommandVM ViewForward { get; set; }
-        public List<int> PageIndexes
-        {
-            get => pageIndexes;
-            set
-            {
-                pageIndexes = value;
-                Signal();
-            }
-        }
-
-        public int SelectedIndex
-        {
-            get => selectedIndex;
-            set
-            {
-                selectedIndex = value;
-                StatisticDate = SqlModel.GetInstance().SelectRowToList_DateTime("SaleDate");
-                Signal();
-            }
-        }
-        //public int[] RowsCountVariants { get; set; }
-        public int ViewRows
-        {
-            get => viewRows;
-            set
-            {
-                viewRows = value;
-                InitPages();
-                Signal();
-            }
+            Formatter = value => new System.DateTime((long)(value * TimeSpan.FromHours(1).Ticks)).ToString("t");
         }
 
         public StatisticVM()
         {
-            //RowsCountVariants = new int[] { 10, 50, 100 };
-            ViewRows = 2;
-
-            ViewBack = new CommandVM(() =>
-            {
-                if (SelectedIndex > 1)
-                    SelectedIndex--;
-            });
-
-            ViewForward = new CommandVM(() =>
-            {
-                if (SelectedIndex < PageIndexes.Last())
-                    SelectedIndex++;
-            });
-        }
-
-        private void InitPages()
-        {
-            var sqlModel = SqlModel.GetInstance();
-            int pageCount = (sqlModel.GetNumRows(typeof(DateTime)));
-            PageIndexes = new List<int>(Enumerable.Range(1, pageCount));
-            SelectedIndex = 1;
+            Points();
         }
     }
 }

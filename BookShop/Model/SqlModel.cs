@@ -120,6 +120,66 @@ namespace BookShop.Model
             return groups;
         }
 
+        public List<Operations> SelectOperationsDB()
+        {
+            var groups = new List<Operations>();
+            var mySqlDB = MySqlDB.GetDB();
+            string query = $"SELECT * FROM `operations`";
+
+            if (mySqlDB.OpenConnection())
+            {
+                using (MySqlCommand mc = new MySqlCommand(query, mySqlDB.sqlConnection))
+                using (MySqlDataReader dr = mc.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        groups.Add(new Operations
+                        {
+                            ID = dr.GetInt32("id"),
+                            Book_id = dr.GetInt32("Book_id"),
+                            ImportBooks = dr.GetInt32("ImportBooks"),
+                            Expenses = dr.GetInt32("Expenses"),
+                            BooksSold = dr.GetInt32("BooksSold"),
+                            Price = dr.GetInt32("Price"),
+                            OperationDate = dr.GetDateTime("OperationDate")
+                        });
+                    }
+                }
+                mySqlDB.CloseConnection();
+            }
+            return groups;
+        }
+
+        public List<OperationsStr> SelectOperationsStrDB()
+        {
+            var groups = new List<OperationsStr>();
+            var mySqlDB = MySqlDB.GetDB();
+            string query = $"SELECT * FROM `operations`, `books` WHERE operations.Book_id = books.id";
+
+            if (mySqlDB.OpenConnection())
+            {
+                using (MySqlCommand mc = new MySqlCommand(query, mySqlDB.sqlConnection))
+                using (MySqlDataReader dr = mc.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        groups.Add(new OperationsStr
+                        {
+                            ID = dr.GetInt32("id"),
+                            Book_id = dr.GetString("Title"),
+                            ImportBooks = dr.GetInt32("ImportBooks"),
+                            Expenses = dr.GetInt32("Expenses"),
+                            BooksSold = dr.GetInt32("BooksSold"),
+                            Price = dr.GetInt32("Price"),
+                            OperationDate = dr.GetDateTime("OperationDate")
+                        });
+                    }
+                }
+                mySqlDB.CloseConnection();
+            }
+            return groups;
+        }
+
         public List<int> SelectRowToList_int(string RowTitle)
         {
             List<int> StrInRow = new List<int>();

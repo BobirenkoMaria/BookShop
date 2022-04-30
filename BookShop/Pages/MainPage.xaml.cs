@@ -38,7 +38,8 @@ namespace BookShop
             this.currentPageControl = currentPageControl;
 
             DataContext = new MainPageVM { Settings = new SettingsVM(passwordBox, currentPageControl), AddNewBook = new AddBookVM(currentPageControl), 
-                ListView = new ListViewDataBaseVM(), ListViewSales = new ListViewSalesVM() };
+                ListView = new ListViewDataBaseVM(), ListViewSales = new ListViewSalesVM(), AddNewOperation = new OperationsVM(),
+                AddNewOperations = new AddOperationVM(currentPageControl), Statistic = new StatisticVM()};
 
             OpenedWin = false;
             DataBaseBorder.Visibility = Visibility.Hidden;
@@ -116,6 +117,12 @@ namespace BookShop
                 AddOperationWin.Visibility = Visibility.Hidden;
                 OpenedAddOperationWin = false;
             }
+        }
+
+        private void AddOperation(object sender, RoutedEventArgs e)
+        {
+            AddOperationWin.Visibility = Visibility.Hidden;
+            NavigationService.Navigate(new MainPage(currentPageControl));
         }
     }
 }
