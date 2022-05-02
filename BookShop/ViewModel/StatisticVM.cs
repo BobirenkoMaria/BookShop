@@ -14,12 +14,40 @@ using LiveCharts.Configurations;
 
 namespace BookShop.ViewModel
 {
-    class StatisticVM 
+    class StatisticVM : BaseVM
     {
-        var dayConfig = Mappers.Xy<DateModel>()
-                .X(dayModel => (double)dayModel.Date.Ticks / TimeSpan.FromHours(1).Ticks)
-                .Y(dayModel => dayModel.Value);
+        private List<DateModel> dateImportBooksModelList;
+        private List<DateModel> dateExpensesModelList;
+        private List<DateModel> dateBooksSoldModelList;
+        private List<DateModel> datePriceModelList;
+        //public List<DateModel> DateModelList
+        //{
+        //    get => dateModelList;
+        //    set
+        //    {
+        //        dateModelList = value;
+        //        Signal();
+        //    }
+        //}
 
+        public StatisticVM()
+        {
+            DateList();
+
+            Points();
+        }
+
+        public void DateList()
+        {
+            dateImportBooksModelList = SqlModel.GetInstance().SelectStatisticDB("ImportBooks");
+            dateExpensesModelList = SqlModel.GetInstance().SelectStatisticDB("Expenses");
+            dateBooksSoldModelList = SqlModel.GetInstance().SelectStatisticDB("BooksSold");
+            datePriceModelList = SqlModel.GetInstance().SelectStatisticDB("Price");
+        }
+
+        /// <summary>
+        /// ///////////////////////////////////////
+        /// </summary>
 
         public SeriesCollection Series { get; set; }
         public string[] Labels { get; set; }
@@ -27,88 +55,60 @@ namespace BookShop.ViewModel
 
         private void Points()
         {
+            var dayConfig = Mappers.Xy<DateModel>()
+            .X(dateModel => dateModel.Date.Ticks / (TimeSpan.FromDays(1).Ticks * 30.44))
+            .Y(dateModel => dateModel.Value);
+
             Series = new SeriesCollection(dayConfig)
             {
                 new LineSeries
                 {
                     Values = new ChartValues<DateModel>
                     {
-                        new DateModel
-                        {
-                            Date = System.DateTime.Now,
-                            Value = 5
-                        },
-                        new DateModel
-                        {
-                            Date = System.DateTime.Now.AddHours(2),
-                            Value = 9
-                        }
+                        dateImportBooksModelList[0],
+                        dateImportBooksModelList[1],
+                        dateImportBooksModelList[2],
                     },
                     Title = "На складе",
                     Fill = Brushes.Transparent
                 },
                 new LineSeries
                 {
-                    Values = new ChartValues<DateModel>
+                    Values = new ChartValues<Tools.DateModel>
                     {
-                        new DateModel
-                        {
-                            Date = System.DateTime.Now,
-                            Value = 5
-                        },
-                        new DateModel
-                        {
-                            Date = System.DateTime.Now.AddHours(2),
-                            Value = 9
-                        },
+                        dateExpensesModelList[0],
+                        dateExpensesModelList[1],
+                        dateExpensesModelList[2],
                     },
                     Title = "Себестоимость",
                     Fill = Brushes.Transparent
                 },
                 new LineSeries
                 {
-                    Values = new ChartValues<DateModel>
+                    Values = new ChartValues<Tools.DateModel>
                     {
-                        new DateModel
-                        {
-                            Date = System.DateTime.Now,
-                            Value = 5
-                        },
-                        new DateModel
-                        {
-                            Date = System.DateTime.Now.AddHours(2),
-                            Value = 9
-                        },
+                        dateBooksSoldModelList[0],
+                        dateBooksSoldModelList[1],
+                        dateBooksSoldModelList[2],
                     },
                     Title = "Продано",
                     Fill = Brushes.Transparent
                 },
                 new LineSeries
                 {
-                    Values = new ChartValues<DateModel>
+                    Values = new ChartValues<Tools.DateModel>
                     {
-                        new DateModel
-                        {
-                            Date = System.DateTime.Now,
-                            Value = 5
-                        },
-                        new DateModel
-                        {
-                            Date = System.DateTime.Now.AddHours(2),
-                            Value = 9
-                        },
+                        datePriceModelList[0],
+                        datePriceModelList[1],
+                        datePriceModelList[2],
                     },
                     Title = "Цена",
                     Fill = Brushes.Transparent
                 }
             };
 
-            Formatter = value => new System.DateTime((long)(value * TimeSpan.FromHours(1).Ticks)).ToString("t");
-        }
-
-        public StatisticVM()
-        {
-            Points();
+            //Formatter = value => new System.DateTime((long)(value * TimeSpan.FromHours(1).Ticks)).ToString("t");  // по часам
+            Formatter = value => new DateTime((long)(value * TimeSpan.FromDays(1).Ticks * 30.44)).ToString("M"); // по месяцам
         }
     }
 }

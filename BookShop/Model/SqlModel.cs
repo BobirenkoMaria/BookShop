@@ -180,11 +180,11 @@ namespace BookShop.Model
             return groups;
         }
 
-        public List<int> SelectRowToList_int(string RowTitle)
+        public List<DateModel> SelectStatisticDB(string RowTitle)
         {
-            List<int> StrInRow = new List<int>();
+            List<DateModel> StrInRow = new List<DateModel>();
             var mySqlDB = MySqlDB.GetDB();
-            string query = $"SELECT {RowTitle} FROM `datebysale`";
+            string query = $"SELECT {RowTitle}, OperationDate FROM `operations`";
 
             if (mySqlDB.OpenConnection())
             {
@@ -194,29 +194,12 @@ namespace BookShop.Model
                     while (dr.Read())
                     {
                         int Value;
-                        StrInRow.Add(dr.GetInt32(RowTitle));
-                    }
-                }
-                mySqlDB.CloseConnection();
-            }
-            return StrInRow;
-        }
-
-        public List<DateTime> SelectRowToList_DateTime(string RowTitle)
-        {
-            List<DateTime> StrInRow = new List<DateTime>();
-            var mySqlDB = MySqlDB.GetDB();
-            string query = $"SELECT {RowTitle} FROM `datebysale`";
-
-            if (mySqlDB.OpenConnection())
-            {
-                using (MySqlCommand mc = new MySqlCommand(query, mySqlDB.sqlConnection))
-                using (MySqlDataReader dr = mc.ExecuteReader())
-                {
-                    while (dr.Read())
-                    {
-                        int Value;
-                        StrInRow.Add(dr.GetDateTime(RowTitle));
+                        StrInRow.Add(
+                            new DateModel
+                            {
+                                Date = dr.GetDateTime("OperationDate"),
+                                Value = dr.GetInt32(RowTitle)
+                            });
                     }
                 }
                 mySqlDB.CloseConnection();
