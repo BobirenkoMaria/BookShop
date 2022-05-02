@@ -39,10 +39,10 @@ namespace BookShop.ViewModel
 
         public void DateList()
         {
-            dateImportBooksModelList = SqlModel.GetInstance().SelectStatisticDB("ImportBooks");
-            dateExpensesModelList = SqlModel.GetInstance().SelectStatisticDB("Expenses");
-            dateBooksSoldModelList = SqlModel.GetInstance().SelectStatisticDB("BooksSold");
-            datePriceModelList = SqlModel.GetInstance().SelectStatisticDB("Price");
+            dateImportBooksModelList = SqlModel.GetInstance().SelectStatisticDB("ImportBooks", 1);
+            dateExpensesModelList = SqlModel.GetInstance().SelectStatisticDB("Expenses", 1);
+            dateBooksSoldModelList = SqlModel.GetInstance().SelectStatisticDB("BooksSold", 1);
+            datePriceModelList = SqlModel.GetInstance().SelectStatisticDB("Price", 1);
         }
 
         /// <summary>
@@ -65,42 +65,37 @@ namespace BookShop.ViewModel
                 {
                     Values = new ChartValues<DateModel>
                     {
-                        dateImportBooksModelList[0],
-                        dateImportBooksModelList[1],
-                        dateImportBooksModelList[2],
+                        dateImportBooksModelList
                     },
                     Title = "На складе",
                     Fill = Brushes.Transparent
                 },
                 new LineSeries
                 {
-                    Values = new ChartValues<Tools.DateModel>
+                    Values = new ChartValues<DateModel>
                     {
                         dateExpensesModelList[0],
                         dateExpensesModelList[1],
-                        dateExpensesModelList[2],
                     },
                     Title = "Себестоимость",
                     Fill = Brushes.Transparent
                 },
                 new LineSeries
                 {
-                    Values = new ChartValues<Tools.DateModel>
+                    Values = new ChartValues<DateModel>
                     {
                         dateBooksSoldModelList[0],
                         dateBooksSoldModelList[1],
-                        dateBooksSoldModelList[2],
                     },
                     Title = "Продано",
                     Fill = Brushes.Transparent
                 },
                 new LineSeries
                 {
-                    Values = new ChartValues<Tools.DateModel>
+                    Values = new ChartValues<DateModel>
                     {
                         datePriceModelList[0],
                         datePriceModelList[1],
-                        datePriceModelList[2],
                     },
                     Title = "Цена",
                     Fill = Brushes.Transparent

@@ -180,11 +180,11 @@ namespace BookShop.Model
             return groups;
         }
 
-        public List<DateModel> SelectStatisticDB(string RowTitle)
+        public List<DateModel> SelectStatisticDB(string RowTitle, int Book_id)
         {
             List<DateModel> StrInRow = new List<DateModel>();
             var mySqlDB = MySqlDB.GetDB();
-            string query = $"SELECT {RowTitle}, OperationDate FROM `operations`";
+            string query = $"SELECT {RowTitle}, OperationDate FROM `operations` WHERE Book_id = {Book_id}";
 
             if (mySqlDB.OpenConnection())
             {
@@ -193,7 +193,6 @@ namespace BookShop.Model
                 {
                     while (dr.Read())
                     {
-                        int Value;
                         StrInRow.Add(
                             new DateModel
                             {
