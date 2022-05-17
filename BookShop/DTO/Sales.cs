@@ -10,6 +10,9 @@ namespace BookShop.DTO
     [Table("sales")]
     public class Sales : BaseDTO
     {
+        [Column("id")]
+        public string Title { get; set; }
+
         [Column("ImportBooks")]
         public int ImportBooks { get; set; }
 

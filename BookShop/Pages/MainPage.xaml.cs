@@ -16,6 +16,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using LiveCharts;
 using LiveCharts.Wpf;
+using BookShop.DTO;
 
 namespace BookShop
 {
@@ -37,9 +38,20 @@ namespace BookShop
 
             this.currentPageControl = currentPageControl;
 
-            DataContext = new MainPageVM { Settings = new SettingsVM(passwordBox, currentPageControl), AddNewBook = new AddBookVM(currentPageControl), 
-                ListView = new ListViewDataBaseVM(), ListViewSales = new ListViewSalesVM(), AddNewOperation = new OperationsVM(),
-                AddNewOperations = new AddOperationVM(currentPageControl), Statistic = new StatisticVM()};
+
+            DataContext = new MainPageVM
+            {
+                Settings = new SettingsVM(passwordBox, currentPageControl),
+                AddNewBook = new AddBookVM(currentPageControl, Dispatcher),
+                ListViewBooks = new ListViewDataBaseVM(),
+                ListViewSales = new ListViewSalesVM(),
+                ListViewOperation = new OperationsVM(),
+                AddNewOperations = new AddOperationVM(currentPageControl),
+                Statistic = new StatisticVM()
+            };
+            ((MainPageVM)DataContext).Statistic.SelectedBookChanged += Statistic_SelectedBookChanged;
+
+            ((MainPageVM)DataContext).AddNewBook.mainVM = (MainPageVM)DataContext;
 
             OpenedWin = false;
             DataBaseBorder.Visibility = Visibility.Hidden;
@@ -52,6 +64,44 @@ namespace BookShop
             OpenedAddOperationWin = false;
             AddOperationWin.Visibility = Visibility.Hidden;
         }
+
+        private void Statistic_SelectedBookChanged(object? sender, Books e)
+        {
+             
+        }
+
+        //public MainPage(CurrentPageControl currentPageControl)
+        //{
+        //    InitializeComponent();
+
+        //    this.currentPageControl = currentPageControl;
+        //    Books selectedBook = new Books();
+        //    selectedBook.Title = ComboStatBooks;
+
+        //    DataContext = new MainPageVM
+        //    {
+        //        Settings = new SettingsVM(passwordBox, currentPageControl),
+        //        AddNewBook = new AddBookVM(currentPageControl, Dispatcher),
+        //        ListViewBooks = new ListViewDataBaseVM(),
+        //        ListViewSales = new ListViewSalesVM(),
+        //        ListViewOperation = new OperationsVM(),
+        //        AddNewOperations = new AddOperationVM(currentPageControl),
+        //        Statistic = new StatisticVM(selectedBook)
+        //    };
+
+        //    ((MainPageVM)DataContext).AddNewBook.mainVM = (MainPageVM)DataContext;
+
+        //    OpenedWin = false;
+        //    DataBaseBorder.Visibility = Visibility.Hidden;
+
+        //    StatWin.Visibility = Visibility.Hidden;
+
+        //    OpenedAddBookWin = false;
+        //    AddBookWin.Visibility = Visibility.Hidden;
+
+        //    OpenedAddOperationWin = false;
+        //    AddOperationWin.Visibility = Visibility.Hidden;
+        //}
 
         private void ConnectDataBase(object sender, RoutedEventArgs e)
         {
@@ -98,7 +148,6 @@ namespace BookShop
         private void AddBook(object sender, RoutedEventArgs e)
         {
             AddBookWin.Visibility = Visibility.Hidden;
-            NavigationService.Navigate(new MainPage(currentPageControl));
         }
 
         private void AddNewOperation(object sender, RoutedEventArgs e)
@@ -122,7 +171,6 @@ namespace BookShop
         private void AddOperation(object sender, RoutedEventArgs e)
         {
             AddOperationWin.Visibility = Visibility.Hidden;
-            NavigationService.Navigate(new MainPage(currentPageControl));
         }
     }
 }

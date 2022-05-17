@@ -27,12 +27,11 @@ namespace BookShop.Model
             GetMetaData(value, out table, out values);
             var query = CreateInsertQuery(table, values);
             var db = MySqlDB.GetDB();
-            // лучше эти 2 запроса объединить в один с помощью транзакции
             int id = db.GetNextID(table);
             db.ExecuteNonQuery(query.Item1, query.Item2);
             return id;
         }
-        // обновляет объект в бд по его id
+
         public void Update<T>(T value) where T : BaseDTO
         {
             string table;
@@ -58,10 +57,66 @@ namespace BookShop.Model
             return MySqlDB.GetDB().GetRowsCount(table);
         }
 
+        public int GetCountRows(string table)
+        {
+            int result = 0;
+            string query = $"SELECT count(*) FROM `{table}`";
+            var mySqlDB = MySqlDB.GetDB();
+
+            if (mySqlDB.OpenConnection())
+            {
+                using (MySqlCommand mc = new MySqlCommand(query, mySqlDB.sqlConnection))
+                using (MySqlDataReader dr = mc.ExecuteReader())
+                {
+                    while(dr.Read()) result = dr.GetInt32("count(*)");
+                }
+            }
+            return result;
+        }
+
         private static string GetTableName(Type type)
         {
             var tableAtrributes = type.GetCustomAttributes(typeof(TableAttribute), false);
             return ((TableAttribute)tableAtrributes.First()).Table;
+        }
+
+        private DateTime? OperationsDateList(int Book_id)
+        {
+            List<DateTime> groups = new List<DateTime>();
+            var mySqlDB = MySqlDB.GetDB();
+            string query = $"SELECT OperationDate FROM `operations` WHERE operations.Book_id = {Book_id}";
+
+            if (mySqlDB.OpenConnection())
+            {
+                using (MySqlCommand mc = new MySqlCommand(query, mySqlDB.sqlConnection))
+                using (MySqlDataReader dr = mc.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        groups.Add(dr.GetDateTime("OperationDate"));
+                    }
+                }
+
+                mySqlDB.CloseConnection();
+            }
+            if(groups.Count == 0)
+            {
+                return null;
+            }
+
+            return groups.Last();
+        }
+
+        public void UpdateSales(int Expences, int newExpences, int Id)
+        {
+            var query = $"UPDATE `sales` SET `{Expences}` = {newExpences} WHERE `sales`.`id` = {Id}";
+            var mySqlDB = MySqlDB.GetDB();
+
+            using (MySqlCommand mc = new MySqlCommand(query, mySqlDB.sqlConnection))
+            using (MySqlDataReader dr = mc.ExecuteReader())
+            {
+                dr.Close();
+            }
         }
 
         public List<Books> SelectBooksDB()
@@ -87,6 +142,26 @@ namespace BookShop.Model
                         });
                     }
                 }
+
+                mySqlDB.CloseConnection();
+            }
+            return groups;
+        }
+
+        public List<Books> InsertBookToSaleDB()
+        {
+            var groups = new List<Books>();
+            var mySqlDB = MySqlDB.GetDB();
+            string query = $"INSERT INTO `sales`(`ImportBooks`, `Expenses`, `BooksSold`, `Price`) VALUES (0,0,0,0)";
+
+            if (mySqlDB.OpenConnection())
+            {
+                using (MySqlCommand mc = new MySqlCommand(query, mySqlDB.sqlConnection))
+                using (MySqlDataReader dr = mc.ExecuteReader())
+                {
+                    dr.Close();
+                }
+
                 mySqlDB.CloseConnection();
             }
             return groups;
@@ -96,7 +171,7 @@ namespace BookShop.Model
         {
             var groups = new List<Sales>();
             var mySqlDB = MySqlDB.GetDB();
-            string query = $"SELECT * FROM `sales`";
+            string query = $"SELECT * FROM `sales`, `books` WHERE sales.id = books.id";
 
             if (mySqlDB.OpenConnection())
             {
@@ -108,6 +183,7 @@ namespace BookShop.Model
                         groups.Add(new Sales
                         {
                             ID = dr.GetInt32("id"),
+                            Title = dr.GetString("Title"),
                             ImportBooks = dr.GetInt32("ImportBooks"),
                             Expenses = dr.GetInt32("Expenses"),
                             BooksSold = dr.GetInt32("BooksSold"),
@@ -120,34 +196,33 @@ namespace BookShop.Model
             return groups;
         }
 
-        public List<Operations> SelectOperationsDB()
+        public int SelectSalesDB(string Row, int Book_id)
         {
-            var groups = new List<Operations>();
             var mySqlDB = MySqlDB.GetDB();
-            string query = $"SELECT * FROM `operations`";
+
+            List<int> byLastTime = new List<int>();
+            string query2 = $"SELECT {Row} FROM `operations` WHERE operations.Book_id = {Book_id}";
 
             if (mySqlDB.OpenConnection())
             {
-                using (MySqlCommand mc = new MySqlCommand(query, mySqlDB.sqlConnection))
+                using (MySqlCommand mc = new MySqlCommand(query2, mySqlDB.sqlConnection))
                 using (MySqlDataReader dr = mc.ExecuteReader())
                 {
                     while (dr.Read())
                     {
-                        groups.Add(new Operations
-                        {
-                            ID = dr.GetInt32("id"),
-                            Book_id = dr.GetInt32("Book_id"),
-                            ImportBooks = dr.GetInt32("ImportBooks"),
-                            Expenses = dr.GetInt32("Expenses"),
-                            BooksSold = dr.GetInt32("BooksSold"),
-                            Price = dr.GetInt32("Price"),
-                            OperationDate = dr.GetDateTime("OperationDate")
-                        });
+                        byLastTime.Add(dr.GetInt32(Row));
                     }
                 }
+
                 mySqlDB.CloseConnection();
             }
-            return groups;
+
+            int sum = 0;
+            for(int i = 0; i < byLastTime.Count; i++)
+            {
+                sum += byLastTime[i];
+            }
+            return sum;
         }
 
         public List<OperationsStr> SelectOperationsStrDB()
@@ -175,12 +250,45 @@ namespace BookShop.Model
                         });
                     }
                 }
-                mySqlDB.CloseConnection();
+
+                    mySqlDB.CloseConnection();
             }
             return groups;
         }
 
-        public List<DateModel> SelectStatisticDB(string RowTitle, int Book_id)
+        public int SelectIntByLastDate(string RowTitle, int Book_id)
+        {
+            var groups = new DateTime?();
+            var mySqlDB = MySqlDB.GetDB();
+            int byLastTime = 0;
+
+            if (groups != null)
+            {
+                groups = OperationsDateList(Book_id);
+
+                
+                string query2 = $"SELECT {RowTitle} FROM `operations` WHERE {groups}";
+
+                if (mySqlDB.OpenConnection())
+                {
+                    using (MySqlCommand mc = new MySqlCommand(query2, mySqlDB.sqlConnection))
+                    using (MySqlDataReader dr = mc.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            byLastTime = dr.GetInt32(RowTitle);
+                        }
+                    }
+
+                    mySqlDB.CloseConnection();
+                }
+            }
+
+
+            return byLastTime;
+        }
+
+        public List<DateModel> SelectStatisticDB(string RowTitle, Books Book_id)
         {
             List<DateModel> StrInRow = new List<DateModel>();
             var mySqlDB = MySqlDB.GetDB();

@@ -20,34 +20,46 @@ namespace BookShop.ViewModel
         private List<DateModel> dateExpensesModelList;
         private List<DateModel> dateBooksSoldModelList;
         private List<DateModel> datePriceModelList;
-        //public List<DateModel> DateModelList
-        //{
-        //    get => dateModelList;
-        //    set
-        //    {
-        //        dateModelList = value;
-        //        Signal();
-        //    }
-        //}
 
-        public StatisticVM()
+        public List<Books> Books { get; set; }
+
+        private Books selectedBook;
+        public event EventHandler<Books> SelectedBookChanged;
+
+        public Books SelectedBook
         {
-            DateList();
+            get => selectedBook;
+            set
+            {
+                selectedBook = value;
+                Signal();
+                SelectedBookChanged?.Invoke(this, value);
+            }
+        }
 
+        public StatisticVM(Books selectedBook)
+        {
+            SqlModel sqlModel = SqlModel.GetInstance();
+            Books = sqlModel.SelectBooksDB();
+            SelectedBook = Books.FirstOrDefault(s => s.ID == selectedBook?.ID);
+
+            DataList();
             Points();
         }
-
-        public void DateList()
+        public StatisticVM()
         {
-            dateImportBooksModelList = SqlModel.GetInstance().SelectStatisticDB("ImportBooks", 1);
-            dateExpensesModelList = SqlModel.GetInstance().SelectStatisticDB("Expenses", 1);
-            dateBooksSoldModelList = SqlModel.GetInstance().SelectStatisticDB("BooksSold", 1);
-            datePriceModelList = SqlModel.GetInstance().SelectStatisticDB("Price", 1);
+            SqlModel sqlModel = SqlModel.GetInstance();
+            Books = sqlModel.SelectBooksDB();
+
         }
 
-        /// <summary>
-        /// ///////////////////////////////////////
-        /// </summary>
+        public void DataList()
+        {
+            dateImportBooksModelList = SqlModel.GetInstance().SelectStatisticDB("ImportBooks", selectedBook);
+            dateExpensesModelList = SqlModel.GetInstance().SelectStatisticDB("Expenses", selectedBook);
+            dateBooksSoldModelList = SqlModel.GetInstance().SelectStatisticDB("BooksSold", selectedBook);
+            datePriceModelList = SqlModel.GetInstance().SelectStatisticDB("Price", selectedBook);
+        }
 
         public SeriesCollection Series { get; set; }
         public string[] Labels { get; set; }
@@ -63,40 +75,25 @@ namespace BookShop.ViewModel
             {
                 new LineSeries
                 {
-                    Values = new ChartValues<DateModel>
-                    {
-                        dateImportBooksModelList
-                    },
+                    Values = new ChartValues<DateModel>(dateImportBooksModelList),
                     Title = "На складе",
                     Fill = Brushes.Transparent
                 },
                 new LineSeries
                 {
-                    Values = new ChartValues<DateModel>
-                    {
-                        dateExpensesModelList[0],
-                        dateExpensesModelList[1],
-                    },
+                    Values = new ChartValues<DateModel>(dateExpensesModelList),
                     Title = "Себестоимость",
                     Fill = Brushes.Transparent
                 },
                 new LineSeries
                 {
-                    Values = new ChartValues<DateModel>
-                    {
-                        dateBooksSoldModelList[0],
-                        dateBooksSoldModelList[1],
-                    },
+                    Values = new ChartValues<DateModel>(dateBooksSoldModelList),
                     Title = "Продано",
                     Fill = Brushes.Transparent
                 },
                 new LineSeries
                 {
-                    Values = new ChartValues<DateModel>
-                    {
-                        datePriceModelList[0],
-                        datePriceModelList[1],
-                    },
+                    Values = new ChartValues<DateModel>(datePriceModelList),
                     Title = "Цена",
                     Fill = Brushes.Transparent
                 }

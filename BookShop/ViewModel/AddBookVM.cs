@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 
 namespace BookShop.ViewModel
 {
@@ -14,7 +15,9 @@ namespace BookShop.ViewModel
         public Books EditBooks { get; set; }
         public CommandVM SaveBook { get; set; }
         private CurrentPageControl currentPageControl;
+        private Dispatcher dispatcher;
 
+        internal MainPageVM mainVM { get; set; }
 
         public AddBookVM(CurrentPageControl currentPageControl)
         {
@@ -22,11 +25,10 @@ namespace BookShop.ViewModel
             EditBooks = new Books();
             InitCommand();
         }
-        public AddBookVM(Books editBook, CurrentPageControl currentPageControl)
+
+        public AddBookVM(CurrentPageControl currentPageControl, Dispatcher dispatcher) : this(currentPageControl)
         {
-            this.currentPageControl = currentPageControl;
-            EditBooks = editBook;
-            InitCommand();
+            this.dispatcher = dispatcher;
         }
 
         private void InitCommand()
@@ -37,7 +39,13 @@ namespace BookShop.ViewModel
                     model.Insert(EditBooks);
                 else
                     model.Update(EditBooks);
+               Task.Delay(1000).ContinueWith(s =>
+               dispatcher.Invoke(()=>
+               mainVM.ListViewBooks.UpdateListView())
+               );
+                SqlModel.GetInstance().InsertBookToSaleDB();
             });
+            
         }
     }
 }
