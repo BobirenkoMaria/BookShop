@@ -38,6 +38,12 @@
                 Background="Transparent"
                 BorderThickness="0"
                 Click="ConnectDataBase"/>
+            <Button
+                Content="🔃"
+                Margin="5 0"
+                Background="Transparent" BorderBrush="Transparent" 
+                Foreground="White"
+                Click="UpdateAll"/>
         </StackPanel>
 
         <!--Control panel-->
@@ -234,17 +240,17 @@
 
         <Grid x:Name="StatWin"
               Grid.Row="0" Grid.Column="1"
-              Visibility="Visible" Grid.RowSpan="2">
+              Visibility="Hidden" Grid.RowSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="222*"/>
                 <ColumnDefinition Width="217*"/>
-                <ColumnDefinition Width="289*"/>
+                <ColumnDefinition Width="226*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="50"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <Border Background="#FF222030" Grid.Row="1" Grid.ColumnSpan="3">
+            <Border Background="#FF222030" Grid.Row="1" Grid.ColumnSpan="4">
                 <lvc:CartesianChart x:Name="SalesByDate" DataContext="{Binding Statistic}" Series="{Binding Series}" 
                                                 LegendLocation="Right" Foreground="White">
                     <lvc:CartesianChart.AxisX>
@@ -256,6 +262,7 @@
                       DisplayMemberPath="Title"
                       ItemsSource="{Binding Statistic.Books}"
                       SelectedItem="{Binding Statistic.SelectedBook}"/>
+
         </Grid>
 
 
@@ -359,7 +366,7 @@
 
         <Grid x:Name="AddOperationWin"
             Grid.ColumnSpan="2" Grid.RowSpan="3"
-              Visibility="Visible">
+              Visibility="Hidden">
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
@@ -399,7 +406,7 @@
                             Margin="0 10"
                             SelectedDate="{Binding EditOperations.OperationDate}"/>
 
-                            <Button Content="Сохранить"
+                        <Button Content="Сохранить"
                             HorizontalAlignment="Right"
                             Command="{Binding SaveOperation}"
                             Click="AddOperation"/>

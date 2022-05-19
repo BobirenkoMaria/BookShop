@@ -24,7 +24,7 @@ namespace BookShop.ViewModel
         public List<Books> Books { get; set; }
 
         private Books selectedBook;
-        public event EventHandler<Books> SelectedBookChanged;
+        //public event EventHandler<Books> SelectedBookChanged;
 
         public Books SelectedBook
         {
@@ -33,7 +33,7 @@ namespace BookShop.ViewModel
             {
                 selectedBook = value;
                 Signal();
-                SelectedBookChanged?.Invoke(this, value);
+                //SelectedBookChanged?.Invoke(this, value);
             }
         }
 
@@ -43,22 +43,28 @@ namespace BookShop.ViewModel
             Books = sqlModel.SelectBooksDB();
             SelectedBook = Books.FirstOrDefault(s => s.ID == selectedBook?.ID);
 
-            DataList();
-            Points();
         }
         public StatisticVM()
         {
             SqlModel sqlModel = SqlModel.GetInstance();
             Books = sqlModel.SelectBooksDB();
-
         }
 
         public void DataList()
         {
-            dateImportBooksModelList = SqlModel.GetInstance().SelectStatisticDB("ImportBooks", selectedBook);
-            dateExpensesModelList = SqlModel.GetInstance().SelectStatisticDB("Expenses", selectedBook);
-            dateBooksSoldModelList = SqlModel.GetInstance().SelectStatisticDB("BooksSold", selectedBook);
-            datePriceModelList = SqlModel.GetInstance().SelectStatisticDB("Price", selectedBook);
+            if (selectedBook == null)
+            {
+                System.Windows.MessageBox.Show("Пожалуйста, выберите книгу");
+            }
+            else
+            {
+                dateImportBooksModelList = SqlModel.GetInstance().SelectStatisticDB("ImportBooks", selectedBook);
+                dateExpensesModelList = SqlModel.GetInstance().SelectStatisticDB("Expenses", selectedBook);
+                dateBooksSoldModelList = SqlModel.GetInstance().SelectStatisticDB("BooksSold", selectedBook);
+                datePriceModelList = SqlModel.GetInstance().SelectStatisticDB("Price", selectedBook);
+
+                Points();
+            }
         }
 
         public SeriesCollection Series { get; set; }
@@ -67,11 +73,13 @@ namespace BookShop.ViewModel
 
         private void Points()
         {
-            var dayConfig = Mappers.Xy<DateModel>()
+            if (selectedBook != null)
+            {
+                var dayConfig = Mappers.Xy<DateModel>()
             .X(dateModel => dateModel.Date.Ticks / (TimeSpan.FromDays(1).Ticks * 30.44))
             .Y(dateModel => dateModel.Value);
 
-            Series = new SeriesCollection(dayConfig)
+                Series = new SeriesCollection(dayConfig)
             {
                 new LineSeries
                 {
@@ -99,8 +107,9 @@ namespace BookShop.ViewModel
                 }
             };
 
-            //Formatter = value => new System.DateTime((long)(value * TimeSpan.FromHours(1).Ticks)).ToString("t");  // по часам
-            Formatter = value => new DateTime((long)(value * TimeSpan.FromDays(1).Ticks * 30.44)).ToString("M"); // по месяцам
+                //Formatter = value => new System.DateTime((long)(value * TimeSpan.FromHours(1).Ticks)).ToString("t");  // по часам
+                Formatter = value => new DateTime((long)(value * TimeSpan.FromDays(1).Ticks * 30.44)).ToString("M"); // по месяцам
+            }
         }
     }
 }

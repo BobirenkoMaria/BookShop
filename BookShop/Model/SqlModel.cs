@@ -292,7 +292,8 @@ namespace BookShop.Model
         {
             List<DateModel> StrInRow = new List<DateModel>();
             var mySqlDB = MySqlDB.GetDB();
-            string query = $"SELECT {RowTitle}, OperationDate FROM `operations` WHERE Book_id = {Book_id}";
+            string query = $"SELECT {RowTitle}, OperationDate FROM `operations` WHERE Book_id = {Book_id.ID}";
+
 
             if (mySqlDB.OpenConnection())
             {
@@ -311,6 +312,7 @@ namespace BookShop.Model
                 }
                 mySqlDB.CloseConnection();
             }
+            
             return StrInRow;
         }
 

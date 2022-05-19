@@ -49,7 +49,7 @@ namespace BookShop
                 AddNewOperations = new AddOperationVM(currentPageControl),
                 Statistic = new StatisticVM()
             };
-            ((MainPageVM)DataContext).Statistic.SelectedBookChanged += Statistic_SelectedBookChanged;
+            //((MainPageVM)DataContext).Statistic.SelectedBookChanged += Statistic_SelectedBookChanged;
 
             ((MainPageVM)DataContext).AddNewBook.mainVM = (MainPageVM)DataContext;
 
@@ -171,6 +171,14 @@ namespace BookShop
         private void AddOperation(object sender, RoutedEventArgs e)
         {
             AddOperationWin.Visibility = Visibility.Hidden;
+        }
+
+        private void UpdateAll(object sender, RoutedEventArgs e)
+        {
+            ((MainPageVM)DataContext).ListViewBooks.UpdateListView();
+            ((MainPageVM)DataContext).ListViewSales.UpdateListView();
+            ((MainPageVM)DataContext).ListViewOperation.UpdateListView();
+            ((MainPageVM)DataContext).Statistic.DataList();
         }
     }
 }
